@@ -18,11 +18,6 @@ import {
 	applications,
 } from "@/server/db/schema/application";
 import {
-	type DeploymentJob,
-	cleanQueuesByApplication,
-} from "@/server/queues/deployments-queue";
-import { myQueue } from "@/server/queues/queueSetup";
-import {
 	removeService,
 	startService,
 	stopService,
@@ -53,6 +48,8 @@ import { addNewService, checkServiceAccess } from "../services/user";
 
 import { unzipDrop } from "@/server/utils/builders/drop";
 import { uploadFileSchema } from "@/utils/schema";
+import {client} from "@/server/queues/queueSetup";
+import {DeploymentJob} from "@/server/queues/lib/types";
 
 export const applicationRouter = createTRPCRouter({
 	create: protectedProcedure
@@ -167,14 +164,7 @@ export const applicationRouter = createTRPCRouter({
 				type: "redeploy",
 				applicationType: "application",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 		}),
 	saveEnvironment: protectedProcedure
 		.input(apiSaveEnvironmentVariables)
@@ -278,20 +268,14 @@ export const applicationRouter = createTRPCRouter({
 				type: "deploy",
 				applicationType: "application",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+
+			client.add(jobData)
 		}),
 
 	cleanQueues: protectedProcedure
 		.input(apiFindOneApplication)
 		.mutation(async ({ input }) => {
-			await cleanQueuesByApplication(input.applicationId);
+			client.cleanQueuesByApplication(input.applicationId);
 		}),
 
 	readTraefikConfig: protectedProcedure
@@ -332,14 +316,7 @@ export const applicationRouter = createTRPCRouter({
 				type: "deploy",
 				applicationType: "application",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 			return true;
 		}),
 	updateTraefikConfig: protectedProcedure

@@ -9,11 +9,6 @@ import {
 	apiUpdateCompose,
 	compose,
 } from "@/server/db/schema";
-import {
-	type DeploymentJob,
-	cleanQueuesByCompose,
-} from "@/server/queues/deployments-queue";
-import { myQueue } from "@/server/queues/queueSetup";
 import { createCommand } from "@/server/utils/builders/compose";
 import { randomizeComposeFile } from "@/server/utils/docker/compose";
 import { addDomainToCompose, cloneCompose } from "@/server/utils/docker/domain";
@@ -46,6 +41,8 @@ import { createMount } from "../services/mount";
 import { findProjectById } from "../services/project";
 import { addNewService, checkServiceAccess } from "../services/user";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import {DeploymentJob} from "@/server/queues/lib/types";
+import {client} from "@/server/queues/queueSetup";
 
 export const composeRouter = createTRPCRouter({
 	create: protectedProcedure
@@ -114,7 +111,7 @@ export const composeRouter = createTRPCRouter({
 	cleanQueues: protectedProcedure
 		.input(apiFindCompose)
 		.mutation(async ({ input }) => {
-			await cleanQueuesByCompose(input.composeId);
+			client.cleanQueuesByCompose(input.composeId);
 		}),
 
 	loadServices: protectedProcedure
@@ -165,14 +162,7 @@ export const composeRouter = createTRPCRouter({
 				applicationType: "compose",
 				descriptionLog: "",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 		}),
 	redeploy: protectedProcedure
 		.input(apiFindCompose)
@@ -184,14 +174,7 @@ export const composeRouter = createTRPCRouter({
 				applicationType: "compose",
 				descriptionLog: "",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 		}),
 	stop: protectedProcedure.input(apiFindCompose).mutation(async ({ input }) => {
 		await stopCompose(input.composeId);

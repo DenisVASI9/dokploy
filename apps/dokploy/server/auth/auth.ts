@@ -7,7 +7,7 @@ import type { Session, User } from "lucia/dist/core.js";
 import { db } from "../db";
 import { type DatabaseUser, auth, sessionTable } from "../db/schema";
 
-globalThis.crypto = webcrypto as Crypto;
+// globalThis.crypto = webcrypto as Crypto;
 export const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, auth);
 
 export const lucia = new Lucia(adapter, {

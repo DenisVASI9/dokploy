@@ -1,12 +1,12 @@
 import { findAdmin } from "@/server/api/services/admin";
 import { db } from "@/server/db";
 import { applications, compose } from "@/server/db/schema";
-import type { DeploymentJob } from "@/server/queues/deployments-queue";
-import { myQueue } from "@/server/queues/queueSetup";
 import { Webhooks } from "@octokit/webhooks";
 import { and, eq } from "drizzle-orm";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { extractCommitMessage, extractHash } from "./[refreshToken]";
+import {client} from "@/server/queues/queueSetup";
+import {DeploymentJob} from "@/server/queues/lib/types";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -74,14 +74,7 @@ export default async function handler(
 				type: "deploy",
 				applicationType: "application",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 		}
 
 		const composeApps = await db.query.compose.findMany({
@@ -101,15 +94,7 @@ export default async function handler(
 				applicationType: "compose",
 				descriptionLog: `Hash: ${deploymentHash}`,
 			};
-
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+			client.add(jobData)
 		}
 
 		const totalApps = apps.length + composeApps.length;

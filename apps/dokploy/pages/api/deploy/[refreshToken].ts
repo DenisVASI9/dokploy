@@ -1,9 +1,9 @@
 import { db } from "@/server/db";
 import { applications } from "@/server/db/schema";
-import type { DeploymentJob } from "@/server/queues/deployments-queue";
-import { myQueue } from "@/server/queues/queueSetup";
 import { eq } from "drizzle-orm";
 import type { NextApiRequest, NextApiResponse } from "next";
+import {DeploymentJob} from "@/server/queues/lib/types";
+import {client} from "@/server/queues/queueSetup";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -76,14 +76,9 @@ export default async function handler(
 				type: "deploy",
 				applicationType: "application",
 			};
-			await myQueue.add(
-				"deployments",
-				{ ...jobData },
-				{
-					removeOnComplete: true,
-					removeOnFail: true,
-				},
-			);
+
+			client.add(jobData);
+
 		} catch (error) {
 			res.status(400).json({ message: "Error To Deploy Application", error });
 			return;

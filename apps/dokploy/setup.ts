@@ -8,6 +8,7 @@ import {
 	createDefaultTraefikConfig,
 	initializeTraefik,
 } from "./server/setup/traefik-setup";
+import {initializeNats} from "./server/setup/nats-setup";
 
 (async () => {
 	try {
@@ -20,6 +21,7 @@ import {
 		await initializeTraefik();
 		await initializeRedis();
 		await initializePostgres();
+		await initializeNats();
 	} catch (e) {
 		console.error("Error to setup dokploy", e);
 	}
