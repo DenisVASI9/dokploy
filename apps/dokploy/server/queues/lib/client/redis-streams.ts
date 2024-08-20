@@ -4,6 +4,16 @@ import { getRedisConnection } from "@/server/queues/lib/connection/redis";
 
 export const getRedisStreamsClient = async (): Promise<GenericClient> => {
     const client = await getRedisConnection();
+
+    const keyType = await client.type(DEPLOYMENTS_QUEUE_NAME);
+
+    if (keyType !== 'stream') {
+        if (keyType !== 'none') {
+            console.log(`Key "${DEPLOYMENTS_QUEUE_NAME}" is not a stream (actual type: ${keyType}), deleting it.`);
+            await client.del(DEPLOYMENTS_QUEUE_NAME);
+        }
+    }
+
     return {
         async add(job: DeploymentJob) {
             const jobId = await client.xadd(

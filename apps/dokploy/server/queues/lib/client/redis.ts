@@ -4,18 +4,19 @@ import { getRedisConnection } from "@/server/queues/lib/connection/redis";
 
 export const getRedisClient = async (): Promise<GenericClient> => {
     const client = await getRedisConnection();
+
+    const keyType = await client.type(DEPLOYMENTS_QUEUE_NAME);
+
+    if (keyType !== 'list') {
+        if (keyType !== 'none') {
+            console.log(`Key "${DEPLOYMENTS_QUEUE_NAME}" is not a list (actual type: ${keyType}), deleting it.`);
+            await client.del(DEPLOYMENTS_QUEUE_NAME);
+        }
+    }
+
     return {
         async add(job: DeploymentJob) {
             const jobString = JSON.stringify(job);
-
-            const keyType = await client.type(DEPLOYMENTS_QUEUE_NAME);
-
-            if (keyType !== 'list') {
-                if (keyType !== 'none') {
-                    console.log(`Key "${DEPLOYMENTS_QUEUE_NAME}" is not a list (actual type: ${keyType}), deleting it.`);
-                    await client.del(DEPLOYMENTS_QUEUE_NAME);
-                }
-            }
 
             await client.rpush(DEPLOYMENTS_QUEUE_NAME, jobString);
 
