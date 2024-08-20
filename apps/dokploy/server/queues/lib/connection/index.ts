@@ -1,12 +1,12 @@
 import {DeploymentWorkerType} from "@/server/queues/lib/types";
 import {getBullMQConnection} from "@/server/queues/lib/connection/bullmq";
-import {getNATSConnection} from "@/server/queues/lib/connection/nats";
 import {TRANSPORT_TYPE} from "@/server/queues/queueSetup";
+import {getRabbitMQConnection} from "@/server/queues/lib/connection/rabbitmq";
 
 export const getGenericConnection = async () => {
     switch (TRANSPORT_TYPE) {
-        case DeploymentWorkerType.NATS: {
-            const connection = await getNATSConnection()
+        case DeploymentWorkerType.RABBITMQ: {
+            const connection = await getRabbitMQConnection()
             return {
                 close() {
                     connection.close()

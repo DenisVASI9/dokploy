@@ -23,7 +23,7 @@ import {
 	getPublicIpWithFallback,
 	setupTerminalWebSocketServer,
 } from "./wss/terminal";
-import {initializeNats} from "@/server/setup/nats-setup";
+import {initializeRabbitMQ} from "@/server/setup/rabbitmq-setup";
 
 config({ path: ".env" });
 const PORT = Number.parseInt(process.env.PORT || "3000", 10);
@@ -52,7 +52,7 @@ void app.prepare().then(async () => {
 			await initializePostgres();
 			await initializeTraefik();
 			await initializeRedis();
-			await initializeNats();
+			await initializeRabbitMQ();
 			initCronJobs();
 			welcomeServer();
 
@@ -66,6 +66,7 @@ void app.prepare().then(async () => {
 		console.log("Server Started:", PORT);
 		const deploymentWorkers = await makeDeploymentWorkers()
 		deploymentWorkers.forEach((worker) => worker.run())
+		console.log("Deployment workers are ready!")
 	} catch (e) {
 		console.error("Main Server Error", e);
 	}

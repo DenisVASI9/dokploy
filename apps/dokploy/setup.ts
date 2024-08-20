@@ -8,7 +8,7 @@ import {
 	createDefaultTraefikConfig,
 	initializeTraefik,
 } from "./server/setup/traefik-setup";
-import {initializeNats} from "./server/setup/nats-setup";
+import {initializeRabbitMQ} from "./server/setup/rabbitmq-setup";
 
 (async () => {
 	try {
@@ -21,7 +21,7 @@ import {initializeNats} from "./server/setup/nats-setup";
 		await initializeTraefik();
 		await initializeRedis();
 		await initializePostgres();
-		await initializeNats();
+		await initializeRabbitMQ();
 	} catch (e) {
 		console.error("Error to setup dokploy", e);
 	}

@@ -1,5 +1,5 @@
-import { type ConnectionOptions as RedisConnectionOptions, Queue } from "bullmq";
-import { type ConnectionOptions as NatsConnectionOptions} from "nats";
+import { type ConnectionOptions as RedisConnectionOptions } from "bullmq";
+import { type Options } from "amqplib";
 import {getGenericConnection} from "@/server/queues/lib/connection";
 import {DeploymentWorkerType} from "@/server/queues/lib/types";
 import {getGenericClient} from "@/server/queues/lib/client";
@@ -9,22 +9,25 @@ export const redisConfig: RedisConnectionOptions = {
 	port: 6379,
 };
 
-export const natsConfig: NatsConnectionOptions = {
-	servers: process.env.NODE_ENV === "production" ? 'dokploy-nats:4222': '127.0.0.1:4222',
+export const rabbitMQConfig:  Options.Connect = {
+	hostname: process.env.NODE_ENV === "production" ? "dokploy-rabbitmq" : "127.0.0.1",
+	port: 5672,
+	username: 'admin',
+	password: '08q7vcgyvqv32fcc2c12s',
 }
 
 export const DEPLOYMENTS_QUEUE_NAME = "deployments"
 
 const getDeploymentQueueTransport = (): DeploymentWorkerType => {
 	switch (process.env.TRANSPORT_TYPE) {
-		case "NATS": {
-			return DeploymentWorkerType.NATS
+		case "RABBITMQ": {
+			return DeploymentWorkerType.RABBITMQ
 		}
 		case "BullMQ": {
 			return DeploymentWorkerType.BullMQ
 		}
 		default: {
-			throw new Error("Transport type required. Set TRANSPORT_TYPE=<NATS | BullMQ> in .env file")
+			throw new Error("Transport type required. Set TRANSPORT_TYPE=<RABBITMQ | BullMQ> in .env file")
 		}
 	}
 }

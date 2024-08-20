@@ -1,12 +1,12 @@
 import {DeploymentWorkerType} from "@/server/queues/lib/types";
 import {getBullMQClient} from "@/server/queues/lib/client/bullmq";
-import {getNATSClient} from "@/server/queues/lib/client/nats";
 import {TRANSPORT_TYPE} from "@/server/queues/queueSetup";
+import {getRabbitMQClient} from "@/server/queues/lib/client/rabbitmq";
 
-export const getGenericClient = () => {
+export const getGenericClient = async () => {
     switch (TRANSPORT_TYPE) {
-        case DeploymentWorkerType.NATS: {
-            return getNATSClient()
+        case DeploymentWorkerType.RABBITMQ: {
+            return getRabbitMQClient()
         }
         case DeploymentWorkerType.BullMQ: {
             return getBullMQClient()

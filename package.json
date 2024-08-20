@@ -23,15 +23,15 @@
 		"prepare": "node ./.config/.husky/install.mjs"
 	},
 	"devDependencies": {
-		"dotenv": "16.4.5",
-		"esbuild": "0.20.2",
-		"tsx": "4.16.2",
-		"lint-staged": "^15.2.7",
 		"@biomejs/biome": "1.8.3",
-		"husky": "^9.0.11",
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
-		"@types/node": "^18.17.0"
+		"@types/node": "^18.17.0",
+		"dotenv": "16.4.5",
+		"esbuild": "0.20.2",
+		"husky": "^9.0.11",
+		"lint-staged": "^15.2.7",
+		"tsx": "4.16.2"
 	},
 	"packageManager": "pnpm@9.5.0",
 	"engines": {
@@ -44,6 +44,11 @@
 		]
 	},
 	"commitlint": {
-		"extends": ["@commitlint/config-conventional"]
+		"extends": [
+			"@commitlint/config-conventional"
+		]
+	},
+	"dependencies": {
+		"async-mutex": "^0.5.0"
 	}
 }

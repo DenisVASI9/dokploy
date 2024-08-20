@@ -20,5 +20,5 @@ export type WorkerHandler = (job: DeployJob) => Promise<void>
 
 export enum DeploymentWorkerType {
     BullMQ,
-    NATS
+    RABBITMQ
 }

@@ -2,21 +2,20 @@ import type { CreateServiceOptions } from "dockerode";
 import { docker } from "../constants";
 import { pullImage } from "../utils/docker/utils";
 
-export const initializeNats = async () => {
-    const imageName = "nats:2.10.18-alpine3.20";
-    const containerName = "dokploy-nats";
+export const initializeRabbitMQ = async () => {
+    const imageName = "rabbitmq:3.13.6-management-alpine";
+    const containerName = "dokploy-rabbitmq";
 
     const settings: CreateServiceOptions = {
         Name: containerName,
         TaskTemplate: {
             ContainerSpec: {
-                // Command: [],
-                Args: ["-js"],
+                Env: ["RABBITMQ_DEFAULT_USER=admin", "RABBITMQ_DEFAULT_PASS=08q7vcgyvqv32fcc2c12s"],
                 Image: imageName,
                 Mounts: [
                     {
                         Type: "volume",
-                        Source: "dokploy-nats",
+                        Source: "dokploy-rabbitmq",
                         Target: "/data",
                     },
                 ],
@@ -34,14 +33,14 @@ export const initializeNats = async () => {
         EndpointSpec: {
             Ports: [
                 {
-                    TargetPort: 4222,
-                    PublishedPort: process.env.NODE_ENV === "development" ? 4222 : 0,
+                    TargetPort: 15672,
+                    PublishedPort: process.env.NODE_ENV === "development" ? 15672 : 0,
                     Protocol: "tcp",
                     PublishMode: "host",
                 },
                 {
-                    TargetPort: 8222,
-                    PublishedPort: process.env.NODE_ENV === "development" ? 8222 : 0,
+                    TargetPort: 5672,
+                    PublishedPort: process.env.NODE_ENV === "development" ? 5672 : 0,
                     Protocol: "tcp",
                     PublishMode: "host",
                 },
@@ -57,9 +56,9 @@ export const initializeNats = async () => {
             version: Number.parseInt(inspect.Version.Index),
             ...settings,
         });
-        console.log("NATS Started ");
+        console.log("RabbitMQ Started ");
     } catch (error) {
         await docker.createService(settings);
-        console.log("NATS Not Found: Starting");
+        console.log("RabbitMQ Not Found: Starting");
     }
 };
