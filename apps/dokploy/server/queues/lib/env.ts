@@ -8,8 +8,11 @@ export const getDeploymentQueueTransport = (): DeploymentWorkerType => {
         case "BullMQ": {
             return DeploymentWorkerType.BullMQ
         }
+        case "REDIS": {
+            return DeploymentWorkerType.REDIS
+        }
         default: {
-            throw new Error("Transport type required. Set TRANSPORT_TYPE=<RABBITMQ | BullMQ> in .env file")
+            throw new Error("Transport type required. Set TRANSPORT_TYPE=<RABBITMQ | REDIS | BullMQ> in .env file")
         }
     }
 }

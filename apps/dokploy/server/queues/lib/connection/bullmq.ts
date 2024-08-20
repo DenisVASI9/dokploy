@@ -1,5 +1,5 @@
 import {Queue} from "bullmq";
-import {redisConfig} from "@/server/queues/queueSetup";
+import {bullConfig} from "@/server/queues/queueSetup";
 
 let connection: Queue | null = null;
 
@@ -7,7 +7,7 @@ export const getBullMQConnection = () => {
     if (!connection) {
         // TODO: maybe add a options to clean the queue to the times
         connection = new Queue("deployments", {
-            connection: redisConfig,
+            connection: bullConfig,
         });
 
         connection.on("error", (error) => {

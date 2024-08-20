@@ -20,7 +20,8 @@ export type WorkerHandler = (job: DeployJob) => Promise<void>
 
 export enum DeploymentWorkerType {
     BullMQ,
-    RABBITMQ
+    RABBITMQ,
+    REDIS
 }
 
 export interface GenericClient {
