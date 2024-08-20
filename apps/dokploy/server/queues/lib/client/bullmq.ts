@@ -1,11 +1,11 @@
 import {getBullMQConnection} from "@/server/queues/lib/connection/bullmq";
-import {DeploymentJob} from "@/server/queues/lib/types";
+import {DeploymentJob, GenericClient} from "@/server/queues/lib/types";
 
-export const getBullMQClient = () => {
+export const getBullMQClient = async (): Promise<GenericClient> => {
     const connection = getBullMQConnection()
     return {
-        add(job: DeploymentJob) {
-            connection.add("deployments",
+        async add(job: DeploymentJob) {
+            await connection.add("deployments",
                 {...job},
                 {
                     removeOnComplete: true,

@@ -22,3 +22,15 @@ export enum DeploymentWorkerType {
     BullMQ,
     RABBITMQ
 }
+
+export interface GenericClient {
+    add: (job: DeploymentJob) => Promise<void>
+
+    cleanQueuesByApplication: (applicationId: string) => Promise<void>
+
+    cleanQueuesByCompose: (composeId: string) => Promise<void>
+}
+
+export interface GenericConnection {
+    close: () => Promise<void>
+}

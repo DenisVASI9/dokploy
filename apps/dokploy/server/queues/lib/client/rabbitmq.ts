@@ -1,9 +1,9 @@
-import {DeploymentJob} from "@/server/queues/lib/types";
+import {DeploymentJob, GenericClient} from "@/server/queues/lib/types";
 import {DEPLOYMENTS_QUEUE_NAME} from "@/server/queues/queueSetup";
 import {Channel} from "amqplib";
 import {getRabbitMQConnection} from "@/server/queues/lib/connection/rabbitmq";
 
-export const getRabbitMQClient = async () => {
+export const getRabbitMQClient = async (): Promise<GenericClient> => {
     const channel: Channel = await getRabbitMQConnection();
 
     return {
@@ -16,11 +16,9 @@ export const getRabbitMQClient = async () => {
 
             console.log(`Job added to queue: ${DEPLOYMENTS_QUEUE_NAME}`, job);
         },
-
         async cleanQueuesByApplication(applicationId: string) {
             throw new Error('cleanQueuesByApplication not implemented');
         },
-
         async cleanQueuesByCompose(composeId: string) {
             throw new Error('cleanQueuesByCompose not implemented');
         },
