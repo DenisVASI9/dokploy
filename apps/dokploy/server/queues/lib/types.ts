@@ -21,7 +21,8 @@ export type WorkerHandler = (job: DeployJob) => Promise<void>
 export enum DeploymentWorkerType {
     BullMQ,
     RABBITMQ,
-    REDIS
+    REDIS,
+    REDIS_STREAMS
 }
 
 export interface GenericClient {

@@ -11,6 +11,9 @@ export const getDeploymentQueueTransport = (): DeploymentWorkerType => {
         case "REDIS": {
             return DeploymentWorkerType.REDIS
         }
+        case "REDIS_STREAMS": {
+            return DeploymentWorkerType.REDIS_STREAMS
+        }
         default: {
             throw new Error("Transport type required. Set TRANSPORT_TYPE=<RABBITMQ | REDIS | BullMQ> in .env file")
         }
